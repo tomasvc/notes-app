@@ -9,43 +9,7 @@ const AddNoteDialog = ({ onClose, onAdd }) => {
     const onSubmit = (e) => {
         e.preventDefault();
         onAdd(name, category, description);
-    }
-
-    /*const onSelect = () => {
-        document.querySelector('.custom-select__trigger').classList.toggle('open');
-
-        for (const option of document.querySelectorAll(".custom-option")) {
-            option.addEventListener('click', () => {
-                if (!this.classList.contains('selected')) {
-                    this.parentNode.querySelector('.custom-option.selected').classList.remove('selected');
-                    this.classList.add('selected');
-                    this.closest('.custom-select').querySelector('.custom-select__trigger span').textContent = this.textContent;
-                }
-            })
-        }
-    
-        window.addEventListener('click', (e => {
-            const select = document.querySelctor('custom-select');
-            if (!select.contains(e.target)) {
-                select.classList.remove('open')
-            }
-        }))
-
-
-        <div className="custom-select-wrapper" onClick={onSelect}>
-                    <div className="custom-select__trigger" onChange={(e) => setCategory(e.target.value)}><span>Select Category</span>
-                        <div className="arrow"></div>
-                    </div>
-                    <div className="custom-options">
-                        <span className="custom-option selected" data-value="home">Home</span>
-                        <span className="custom-option" data-value="home">Home</span>
-                        <span className="custom-option" data-value="home">Home</span>
-                    </div>
-                </div>
-
-    }*/
-
-    
+    }  
 
     return (
         <dialog className="dialog" open>
