@@ -14,7 +14,7 @@ body {
 
 .title-background {
   background: rgb(64, 58, 109);
-  padding: 120px 0 20px 0;
+  padding: 60px 0 20px 0;
 }
 
 .app-title {
@@ -96,6 +96,11 @@ body {
   color: white;
 }
 
+.sign-in {
+  position: relative;
+  top: 20px;
+}
+
 .sign-out {
   position: relative;
   left: 165px;
@@ -121,6 +126,13 @@ body {
 .add-btn:hover {
   background-color: #1d8ae4;
   cursor: pointer;
+}
+
+.empty-message {
+  color: #00000099;
+  font-weight: 500;
+  opacity: 0.6;
+  cursor: default;
 }
 
 .note {

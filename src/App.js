@@ -37,7 +37,17 @@ function App({ name, category, description }) {
 
   const [notes] = useCollectionData(query);
 
+  const [filterList, setFilterList] = useState([])
+
+  const [searchList, setSearchList] = useState([])
+
   const [open, setOpen] = useState(false);
+
+  const filter = (value) => {
+    setFilterList(notes.filter((note) => {
+      return note.category == value
+    }))
+  }
 
   const closeDialog = () => {
     setOpen(false);
@@ -67,12 +77,25 @@ function App({ name, category, description }) {
 
   }
 
-  const deleteNote = (id) => {
+  const searchNotes = (input) => {
+    setSearchList(notes.filter((note) => {
+      return note.name.includes(input)
+    }))
+  }
 
+  const deleteNote = (id) => {
     notesRef.doc(id).delete().then(() => {
       console.log('Note deleted with ID ' + notesRef.id);
     });
   } 
+
+  const editNote = (id, name, category, description) => {
+    notesRef.doc(id).update({
+      name: name,
+      category: category,
+      description: description
+    })
+  }
 
   return (
       <div className="App">
@@ -82,18 +105,23 @@ function App({ name, category, description }) {
               <h1 className="app-title">notes.</h1>
               <h3 className="welcome-message">Hello {user.displayName.substr(0, user.displayName.indexOf(" "))} 👋</h3>
             </div>
-            <SearchNotes />
-            <Filter />
+            <SearchNotes onSearch={searchNotes}/>
+            <Filter onFilter={filter} />
             <AddButton handleClick={openDialog} />
             <SignOut />
-            <Notes notes={notes} onDelete={deleteNote}/>
+            {searchList.length != 0 ? <Notes notes={searchList} onDelete={deleteNote} onEdit={editNote} /> : 
+            filterList.length != 0 ? <Notes notes={filterList} onDelete={deleteNote} onEdit={editNote} /> :
+            notes != undefined ? <Notes notes={notes} onDelete={deleteNote} onEdit={editNote} /> :
+            <h1 className="empty-message">You don't have any notes</h1>}
             {open && <AddNoteDialog onAdd={addNote} onClose={closeDialog} />}
           </div>
           :
-          <div className="title-background">
-            <h1 className="app-title">notes.</h1>
+          <>
+            <div className="title-background">
+              <h1 className="app-title">notes.</h1>
+            </div>
             <SignIn />
-          </div>       
+          </>      
         }
       </div>
   );
