@@ -3,7 +3,9 @@ import React, { useState } from 'react';
 import Notes from './components/Notes';
 import AddButton from './components/AddButton';
 import AddNoteDialog from './components/AddNoteDialog';
+import EditNote from './components/EditNote';
 import SearchNotes from './components/SearchNotes';
+import ProgressBar from './components/ProgressBar';
 import Filter from './components/Filter';
 import SignIn from './components/SignIn';
 import SignOut from './components/SignOut';
@@ -28,7 +30,7 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const firestore = firebase.firestore();
 
-function App({ name, category, description }) {
+function App() {
 
   const [user] = useAuthState(auth);
 
@@ -41,7 +43,8 @@ function App({ name, category, description }) {
 
   const [searchList, setSearchList] = useState([])
 
-  const [open, setOpen] = useState(false);
+  const [openAdd, setOpenAdd] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
 
   const filter = (value) => {
     setFilterList(notes.filter((note) => {
@@ -49,17 +52,21 @@ function App({ name, category, description }) {
     }))
   }
 
-  const closeDialog = () => {
-    setOpen(false);
+  const closeAddDialog = () => {
+    setOpenAdd(false);
   }
 
-  const openDialog = () => {
-    setOpen(true);
+  const openAddDialog = () => {
+    setOpenAdd(true);
+  }
+
+  const closeEditDialog = () => {
+    setOpenAdd(false);
   }
 
   const addNote = (name, category, description) => {
 
-    closeDialog();
+    closeAddDialog();
 
     notesRef.add({
       name: name,
@@ -84,17 +91,28 @@ function App({ name, category, description }) {
   }
 
   const deleteNote = (id) => {
+
     notesRef.doc(id).delete().then(() => {
       console.log('Note deleted with ID ' + notesRef.id);
-    });
+    })
+    .catch((error) => {
+      console.log("Error deleting note", error)
+    })
   } 
 
+  const showNotes = (notes) => {
+    return notes.length.toString();
+  }
+
   const editNote = (id, name, category, description) => {
-    notesRef.doc(id).update({
+
+    setOpenEdit(true);
+
+    /*notesRef.doc(id).update({
       name: name,
       category: category,
       description: description
-    })
+    })*/
   }
 
   return (
@@ -107,13 +125,15 @@ function App({ name, category, description }) {
             </div>
             <SearchNotes onSearch={searchNotes}/>
             <Filter onFilter={filter} />
-            <AddButton handleClick={openDialog} />
+            <AddButton handleClick={openAddDialog} />
             <SignOut />
+            <ProgressBar onChange={showNotes}/>
             {searchList.length != 0 ? <Notes notes={searchList} onDelete={deleteNote} onEdit={editNote} /> : 
             filterList.length != 0 ? <Notes notes={filterList} onDelete={deleteNote} onEdit={editNote} /> :
             notes != undefined ? <Notes notes={notes} onDelete={deleteNote} onEdit={editNote} /> :
             <h1 className="empty-message">You don't have any notes</h1>}
-            {open && <AddNoteDialog onAdd={addNote} onClose={closeDialog} />}
+            {openAdd && <AddNoteDialog onAdd={addNote} onClose={closeAddDialog} />}
+            {openEdit && <EditNote onEdit={editNote} onClose={closeEditDialog} />}
           </div>
           :
           <>

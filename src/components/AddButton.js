@@ -1,8 +1,10 @@
 import React from 'react'
 
+import Button from '@material-ui/core/Button';
+
 const AddButton = ({ handleClick }) => {
     return (
-        <button className="add-btn" onClick={handleClick}>Add Note</button>
+        <Button color="primary" variant="contained" className="add-btn" onClick={handleClick}>Add Note</Button>
     )
 }
 

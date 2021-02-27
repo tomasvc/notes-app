@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-const EditNote = () => {
+const EditNote = ({ onClose }) => {
 
     const [name, setName] = useState('');
     const [category, setCategory] = useState('');

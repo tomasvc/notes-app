@@ -10,7 +10,9 @@ const SearchNotes = ({ onSearch }) => {
     }
 
     return (
-        <input className="search-bar" placeholder="Search notes" onChange={handleChange} />
+        <div>
+            <input className="search-bar" placeholder="Search notes" onChange={handleChange} />
+        </div>
     )
 }
 
