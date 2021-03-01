@@ -74,13 +74,14 @@ function App() {
       name: name,
       category: category,
       description: description,
+      complete: false,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     })
     .then((docRef) => {
       console.log("Document successfully written with ID: " + docRef.id)
       notesRef.doc(docRef.id).update({id: docRef.id})
-      setNoteNum(noteNum + 1);
-      console.log(noteNum)
+      setNoteNum(notes.length + 1);
+      console.log(noteNum);
     })
     .catch((error) => {
       console.log("Error writing document: ", error)
@@ -88,16 +89,31 @@ function App() {
 
   }
 
+
+  const completeNote = (id) => {
+    if (noteNum != 0) {
+      setComplete(complete + 1);
+    } else {
+      setComplete(0)
+    }
+    
+  }
+
+
   const searchNotes = (input) => {
-    setSearchList(notes.filter((note) => {
-      return note.name.includes(input)
-    }))
+    if (input) {
+      setSearchList(notes.filter((note) => {
+        return note.name.includes(input)
+      }))
+    } else
+      setSearchList([]);
   }
 
   const deleteNote = (id) => {
 
     notesRef.doc(id).delete().then(() => {
       console.log('Note deleted with ID ' + notesRef.id);
+      setNoteNum(notes.length - 1);
     })
     .catch((error) => {
       console.log("Error deleting note", error)
@@ -132,16 +148,16 @@ function App() {
             <Filter onFilter={filter} />
             <AddButton handleClick={openAddDialog} />
             <SignOut />
-            <ProgressBar noteNum={noteNum} onChange={showNotes}/>
+            <ProgressBar noteNum={noteNum} completeNum={complete} onChange={showNotes}/>
 
-            {searchList.length != 0 ? <Notes notes={searchList} onDelete={deleteNote} onEdit={editNote} /> 
+            {searchList.length != 0 ? <Notes notes={searchList} onComplete={completeNote} onDelete={deleteNote} onEdit={editNote} /> 
             : 
-            filterList.length != 0 ? <Notes notes={filterList} onDelete={deleteNote} onEdit={editNote} /> 
+            filterList.length != 0 ? <Notes notes={filterList} onComplete={completeNote} onDelete={deleteNote} onEdit={editNote} /> 
             :
-            notes != undefined ? <Notes notes={notes} onDelete={deleteNote} onEdit={editNote} /> 
+            notes != undefined ? <Notes notes={notes} onComplete={completeNote} onDelete={deleteNote} onEdit={editNote} /> 
             :
             <h1 className="empty-message">You don't have any notes</h1>}
-            
+
             {addDialog && <AddNoteDialog onAdd={addNote} onClose={closeAddDialog} />}
             {editDialog && <EditNote /*name={title} category={category} description={description}*/ onEdit={editNote} onClose={closeEditDialog} />}
           </div>

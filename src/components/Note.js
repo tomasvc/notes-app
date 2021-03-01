@@ -10,9 +10,9 @@ import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-const Note = ({ note, onEdit, onDelete }) => {
+const Note = ({ note, onComplete, onEdit, onDelete }) => {
 
-    const [active, setActive] = useState(false);
+    const [complete, setComplete] = useState(false);
 
     let lineColor = '';
 
@@ -26,13 +26,14 @@ const Note = ({ note, onEdit, onDelete }) => {
 
     let style = {'color': textColor, 'textDecoration': textDecoration, 'transition': '0.2s ease'}
 
-    const onCheck = () => {
-        if (active == false) {
-            setActive(true);
+    const onCheck = (id) => {
+        if (complete == false) {
+            setComplete(true);
             textColor = '#555';
             textDecoration = 'line-through'; 
+            onComplete(id);
         } else {
-            setActive(false);
+            setComplete(false);
             textColor = 'black';
             textDecoration = 'none'; 
         }
@@ -51,7 +52,7 @@ const Note = ({ note, onEdit, onDelete }) => {
 
         
 
-        <Card className="note" style={ active ? {'backgroundColor': '#00000015', 'transition': '0.2s ease'} :{'transition': '0.2s ease'}}>
+        <Card className="note" style={ complete ? {'backgroundColor': '#00000015', 'transition': '0.2s ease'} :{'transition': '0.2s ease'}}>
             <CardMedia component="div" style={{
                 'backgroundColor': lineColor,
                 'padding': '5px',
@@ -63,14 +64,14 @@ const Note = ({ note, onEdit, onDelete }) => {
             <CardContent>
                 
                 <CardActions>
-                    <Checkbox className="note-checkbox" color="primary" checked={active} onClick={onCheck}></Checkbox>
+                    <Checkbox className="note-checkbox" color="primary" checked={complete} onClick={() => onCheck(note.id)}></Checkbox>
                 </CardActions>
-                <Typography className="note-title" variant="h6" style={ active ? style : {'transition': '0.2s ease'}}>{note.name}</Typography>
+                <Typography className="note-title" variant="h6" style={ complete ? style : {'transition': '0.2s ease'}}>{note.name}</Typography>
                 <CardActions>
                     <IconButton className="edit-btn" onClick={() => onEdit(note.id)} aria-label="edit"><EditIcon /></IconButton>
                     <IconButton className="delete-btn" onClick={() => onDelete(note.id)} aria-label="delete"><DeleteIcon /></IconButton>
                 </CardActions>
-                <Typography className="note-description" variant="body1" style={ active ? style : {'transition': '0.2s ease'}}>{note.description}</Typography>
+                <Typography className="note-description" variant="body1" style={ complete ? style : {'transition': '0.2s ease'}}>{note.description}</Typography>
             </CardContent>
         </Card>
         

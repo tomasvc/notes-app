@@ -1,17 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 const SearchNotes = ({ onSearch }) => {
 
     const [input, setInput] = useState('');
 
-    const handleChange = (e) => {
-        setInput(e.target.value);
-        onSearch(input);
-    }
+    useEffect(() => {
+        return onSearch(input);
+    }, [input])
 
     return (
         <div>
-            <input className="search-bar" placeholder="Search notes" onChange={handleChange} />
+            <input className="search-bar" placeholder="Search notes" onChange={(e) => setInput(e.target.value)} />
         </div>
     )
 }
