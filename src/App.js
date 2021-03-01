@@ -38,13 +38,15 @@ function App() {
   const query = notesRef.orderBy('createdAt');
 
   const [notes] = useCollectionData(query);
+  const [noteNum, setNoteNum] = useState(0);
+  const [complete, setComplete] = useState(0);
 
   const [filterList, setFilterList] = useState([])
 
   const [searchList, setSearchList] = useState([])
 
-  const [openAdd, setOpenAdd] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
+  const [addDialog, setAddDialog] = useState(false);
+  const [editDialog, setEditDialog] = useState(false);
 
   const filter = (value) => {
     setFilterList(notes.filter((note) => {
@@ -53,15 +55,15 @@ function App() {
   }
 
   const closeAddDialog = () => {
-    setOpenAdd(false);
+    setAddDialog(false);
   }
 
   const openAddDialog = () => {
-    setOpenAdd(true);
+    setAddDialog(true);
   }
 
   const closeEditDialog = () => {
-    setOpenAdd(false);
+    setEditDialog(false);
   }
 
   const addNote = (name, category, description) => {
@@ -77,6 +79,8 @@ function App() {
     .then((docRef) => {
       console.log("Document successfully written with ID: " + docRef.id)
       notesRef.doc(docRef.id).update({id: docRef.id})
+      setNoteNum(noteNum + 1);
+      console.log(noteNum)
     })
     .catch((error) => {
       console.log("Error writing document: ", error)
@@ -101,12 +105,13 @@ function App() {
   } 
 
   const showNotes = (notes) => {
+    console.log(notes.length.toString());
     return notes.length.toString();
   }
 
   const editNote = (id, name, category, description) => {
 
-    setOpenEdit(true);
+    setEditDialog(true);
 
     /*notesRef.doc(id).update({
       name: name,
@@ -127,13 +132,18 @@ function App() {
             <Filter onFilter={filter} />
             <AddButton handleClick={openAddDialog} />
             <SignOut />
-            <ProgressBar onChange={showNotes}/>
-            {searchList.length != 0 ? <Notes notes={searchList} onDelete={deleteNote} onEdit={editNote} /> : 
-            filterList.length != 0 ? <Notes notes={filterList} onDelete={deleteNote} onEdit={editNote} /> :
-            notes != undefined ? <Notes notes={notes} onDelete={deleteNote} onEdit={editNote} /> :
+            <ProgressBar noteNum={noteNum} onChange={showNotes}/>
+
+            {searchList.length != 0 ? <Notes notes={searchList} onDelete={deleteNote} onEdit={editNote} /> 
+            : 
+            filterList.length != 0 ? <Notes notes={filterList} onDelete={deleteNote} onEdit={editNote} /> 
+            :
+            notes != undefined ? <Notes notes={notes} onDelete={deleteNote} onEdit={editNote} /> 
+            :
             <h1 className="empty-message">You don't have any notes</h1>}
-            {openAdd && <AddNoteDialog onAdd={addNote} onClose={closeAddDialog} />}
-            {openEdit && <EditNote onEdit={editNote} onClose={closeEditDialog} />}
+            
+            {addDialog && <AddNoteDialog onAdd={addNote} onClose={closeAddDialog} />}
+            {editDialog && <EditNote /*name={title} category={category} description={description}*/ onEdit={editNote} onClose={closeEditDialog} />}
           </div>
           :
           <>

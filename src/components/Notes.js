@@ -2,6 +2,7 @@ import React from 'react'
 import Note from './Note'
 
 const Notes = ({ notes, onDelete, onEdit }) => {
+
     return (
         <div className="notes">
             {notes && notes.map((note) => (

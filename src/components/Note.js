@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -12,6 +12,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 
 const Note = ({ note, onEdit, onDelete }) => {
 
+    const [active, setActive] = useState(false);
+
     let lineColor = '';
 
     note.category == 'home' ? lineColor = '#FF9100' : 
@@ -19,12 +21,23 @@ const Note = ({ note, onEdit, onDelete }) => {
     note.category == 'personal' ? lineColor = '#66BB6A' : 
     lineColor = '';
 
+    let textColor = '#555';
+    let textDecoration = 'line-through';
 
-    let noteColor = 'white';
+    let style = {'color': textColor, 'textDecoration': textDecoration, 'transition': '0.2s ease'}
 
     const onCheck = () => {
-        noteColor = '#282E2999';
-    }
+        if (active == false) {
+            setActive(true);
+            textColor = '#555';
+            textDecoration = 'line-through'; 
+        } else {
+            setActive(false);
+            textColor = 'black';
+            textDecoration = 'none'; 
+        }
+        
+    }            
 
     return (
         /*<div className={`note ${note.category == 'home' ? 'home' : note.category == 'work' ? 'work' : 'personal'}`}>
@@ -38,7 +51,7 @@ const Note = ({ note, onEdit, onDelete }) => {
 
         
 
-        <Card className="note" >
+        <Card className="note" style={ active ? {'backgroundColor': '#00000015', 'transition': '0.2s ease'} :{'transition': '0.2s ease'}}>
             <CardMedia component="div" style={{
                 'backgroundColor': lineColor,
                 'padding': '5px',
@@ -47,17 +60,17 @@ const Note = ({ note, onEdit, onDelete }) => {
                 'left': '-20px',
                 'width': '110%'
                 }}></CardMedia>
-            <CardContent style={{'background': noteColor}}>
+            <CardContent>
                 
                 <CardActions>
-                    <Checkbox className="note-checkbox" color="primary" onClick={onCheck}></Checkbox>
+                    <Checkbox className="note-checkbox" color="primary" checked={active} onClick={onCheck}></Checkbox>
                 </CardActions>
-                <Typography className="note-title" variant="h6">{note.name}</Typography>
+                <Typography className="note-title" variant="h6" style={ active ? style : {'transition': '0.2s ease'}}>{note.name}</Typography>
                 <CardActions>
                     <IconButton className="edit-btn" onClick={() => onEdit(note.id)} aria-label="edit"><EditIcon /></IconButton>
                     <IconButton className="delete-btn" onClick={() => onDelete(note.id)} aria-label="delete"><DeleteIcon /></IconButton>
                 </CardActions>
-                <Typography className="note-description" variant="body1">{note.description}</Typography>
+                <Typography className="note-description" variant="body1" style={ active ? style : {'transition': '0.2s ease'}}>{note.description}</Typography>
             </CardContent>
         </Card>
         

@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 
+import { Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, TextField, Button } from '@material-ui/core';
+
 const EditNote = ({ onClose }) => {
 
     const [name, setName] = useState('');
@@ -12,7 +14,7 @@ const EditNote = ({ onClose }) => {
     } 
 
     return (
-        <dialog className="dialog" open>
+        /*<dialog className="dialog" open>
             <label className="dialog-label">Edit Note</label>
             
             <form className="dialog-form" onSubmit={onEdit}>
@@ -33,7 +35,29 @@ const EditNote = ({ onClose }) => {
                 <button className="submit-btn" type="submit">Edit</button>
             </div>
             </form>
-        </dialog>
+        </dialog>*/
+
+
+        <Dialog className="dialog" maxWidth="md" open>
+            <DialogTitle>Edit note</DialogTitle>
+            <DialogContent>
+                <TextField className="title-input" variant="outlined" label="Name" onChange={(e) => setName(e.target.value)} required />
+                <FormControl className="category-input" variant="outlined">
+                    <InputLabel>Category</InputLabel>
+                    <Select label="Category" value={category} onChange={(e) => setCategory(e.target.value)}>
+                        <MenuItem value="home">Home</MenuItem>
+                        <MenuItem value="work">Work</MenuItem>
+                        <MenuItem value="personal">Personal</MenuItem>
+                    </Select>
+                </FormControl>
+                <TextField className="description-input" variant="outlined" label="Description" onChange={(e) => setDescription(e.target.value)} required />
+            </DialogContent>
+            <DialogActions>
+                <Button autofocus color="primary" onClick={onClose}>Cancel</Button>
+                <Button autofocus color="primary" onClick={onEdit}>Add</Button>
+            </DialogActions>
+        </Dialog>
+
     )
 }
 
