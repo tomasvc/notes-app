@@ -37,7 +37,7 @@ function App() {
   const notesRef = firestore.collection('notes');
   const query = notesRef.orderBy('createdAt');
 
-  const [notes] = useCollectionData(query);
+  const [notes] = useCollectionData(query, {idField: 'id'});
   const [noteNum, setNoteNum] = useState(0);
   const [complete, setComplete] = useState(0);
 
@@ -50,7 +50,7 @@ function App() {
 
   const filter = (value) => {
     setFilterList(notes.filter((note) => {
-      return note.category == value
+      return note.category === value
     }))
   }
 
@@ -68,9 +68,12 @@ function App() {
 
   const addNote = (name, category, description) => {
 
+    const { uid } = auth.currentUser;
+
     closeAddDialog();
 
     notesRef.add({
+      user_id: uid,
       name: name,
       category: category,
       description: description,
@@ -89,16 +92,13 @@ function App() {
 
   }
 
-
   const completeNote = (id) => {
-    if (noteNum != 0) {
+    if (noteNum !== 0) {
       setComplete(complete + 1);
     } else {
       setComplete(0)
     }
-    
   }
-
 
   const searchNotes = (input) => {
     if (input) {
@@ -110,7 +110,6 @@ function App() {
   }
 
   const deleteNote = (id) => {
-
     notesRef.doc(id).delete().then(() => {
       console.log('Note deleted with ID ' + notesRef.id);
       setNoteNum(notes.length - 1);
@@ -150,11 +149,11 @@ function App() {
             <SignOut />
             <ProgressBar noteNum={noteNum} completeNum={complete} onChange={showNotes}/>
 
-            {searchList.length != 0 ? <Notes notes={searchList} onComplete={completeNote} onDelete={deleteNote} onEdit={editNote} /> 
+            {searchList.length !== 0 ? <Notes notes={searchList} onComplete={completeNote} onDelete={deleteNote} onEdit={editNote} /> 
             : 
-            filterList.length != 0 ? <Notes notes={filterList} onComplete={completeNote} onDelete={deleteNote} onEdit={editNote} /> 
+            filterList.length !== 0 ? <Notes notes={filterList} onComplete={completeNote} onDelete={deleteNote} onEdit={editNote} /> 
             :
-            notes != undefined ? <Notes notes={notes} onComplete={completeNote} onDelete={deleteNote} onEdit={editNote} /> 
+            notes !== undefined ? <Notes notes={notes} onComplete={completeNote} onDelete={deleteNote} onEdit={editNote} /> 
             :
             <h1 className="empty-message">You don't have any notes</h1>}
 
