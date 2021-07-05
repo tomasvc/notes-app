@@ -10,6 +10,9 @@ body {
 .App {
   text-align: center;
   background: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .title-background {
@@ -35,8 +38,10 @@ body {
 }
 
 .search-bar {
-  display: block;
-  width: 800px;
+  display: flex;
+  justify-content: center;
+  max-width: 800px;
+  width: 90%;
   height: 23px;
   box-shadow: 0px 3px 6px #00000029;
   border: none;
@@ -55,10 +60,18 @@ body {
   box-shadow: 0px 3px 9px #00000045;
 }
 
+.nav-container {
+  max-width: 820px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: auto;
+}
+
 .filter-buttons {
   display: inline-block;
   position: relative;
-  left: -165px;
 }
 
 .all-btn, .home-btn, .work-btn, .personal-btn {
@@ -104,22 +117,31 @@ body {
 
 .sign-out {
   position: relative;
-  left: 165px;
 }
 
 .add-btn {
-  position: relative;
-  left: 150px;
+  margin-right: 10px !important;
+}
+
+.progress-container {
+  max-width: 820px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: auto;
 }
 
 .progress-message {
-  width: 58%;
-  margin: 0 auto;
+  max-width: 820px;
+  width: 100%;
   padding: 10px;
+  text-align: left;
 }
 
 .progress-bar {
-  width: 54.5%;
+  max-width: 820px;
+  width: 100%;
   margin: 0 auto 30px auto;
 }
 
@@ -131,8 +153,10 @@ body {
 }
 
 .note {
-  width: 380px;
-  height: 174px;
+  display: flex;
+  max-width: 350px;
+  width: 100%;
+  max-height: 174px;
   display: inline-block;
   text-overflow: ellipsis;
   color: white;
@@ -147,15 +171,24 @@ body {
   box-shadow: 0 3px 5px #00000042;
 }
 
-.note div {
-  width: 100%;
-  text-align: left;
+.card-content {
+  position: relative;
+  top: -20px;
+  left: -15.5px;
+  width: 106%;
+  padding: 5px 10px 5px 0 !important;
 }
 
-.note-checkbox {
-  position: relative;
-  top: -30px;
-  left: -30px;
+.card-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
 }
 
 .note-checkbox:hover, .edit-btn:hover, .delete-btn:hover {
@@ -164,39 +197,23 @@ body {
 }
 
 .note-title {
-  position: relative;
-  top: -75px;
-  left: 25px;
-  text-align: left;
   margin-left: 22px;
 }
 
-.edit-btn {
-  position: relative;
-  top: -118px;
-  left: 260px;
-  width: 40px;
-  height: 40px;
-  margin-right: 50px;
-}
-
 .delete-btn {
-  position: relative;
-  top: -118px;
-  left: 265px;
   width: 40px;
   height: 40px;
-  margin-right: 200px;
 }
 
 .note-description {
-  position: relative;
-  top: -120px;
-  left: -10px;
+  width: 92%;
+  padding: 0 20px;
   height: 120px;
   font: normal normal medium 20px/26px Roboto;
   text-align: left;
   text-overflow: ellipsis;
+  overflow: hidden;
+  word-wrap: break-word;
 }
 
 .home {
@@ -211,69 +228,10 @@ body {
   background: #FF9100  0% 0% no-repeat padding-box;
 }
 
-.dialog {
-  margin: auto;
-}
-
-.dialog-label {
-  color: #00000099;
-  display: block;
-  text-align: left;
-  font: normal normal normal 24px/29px Roboto;
-  opacity: 0.8;
-  margin: 9px 17px 18px 17px;
-  border-bottom: 1px solid #00000029;
-}
-
-.dialog-form {
-  flex-wrap: wrap;
-}
-
-.title-input {
-  position: relative;
-  width: 475px;
-  font: normal normal normal 16px/24px Roboto;
-  letter-spacing: 0.15px;
-  color: #00000099;
-  margin: 0 20px 20px 0;
-}
-
-.category-input {
-  position: relative;
-  width: 270px;
-  height: 48px;
-  font: normal normal normal 16px/24px Roboto;
-  letter-spacing: 0.15px;
-  color: #00000099;
-  padding: 14px 16px 11px 16px;
-}
-
-.description-input {
-  position: relative;
-  width: 475px;
-  height: 227px;
-  margin: 28px 0;
-  font: normal normal normal 16px/24px Roboto;
-  letter-spacing: 0.15px;
-  color: #00000099;
-  padding: 14px 16px 11px 16px;
-}
-
-.cancel-btn, .submit-btn {
-  padding: 8px;
-  display: inline-block;
-  margin: 0;
-  font: normal normal 400 14px/16px Roboto;
-  letter-spacing: 1.25px;
-  text-transform: uppercase;
-}
-
-.cancel-btn:hover, .submit-btn:hover {
-  cursor: pointer;
-}
-
 .notes {
-  width: 70%;
+  max-width: 820px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   margin: 0 auto;
-  margin-top: 10px;
 }

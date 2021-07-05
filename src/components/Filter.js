@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 const Filter = ({ onFilter }) => {
 
@@ -8,10 +8,10 @@ const Filter = ({ onFilter }) => {
 
         onFilter(e.target.value)
 
-        e.target.value == 'all' ? style = '#69BCFF' :
-        e.target.value ==  'home' ? style = '#FF9100' :
-        e.target.value == 'work' ? style = '#5C6BC0' :
-        e.target.value == 'personal' ? style = '#66BB6A' :
+        e.target.value === 'all' ? style = '#69BCFF' :
+        e.target.value ===  'home' ? style = '#FF9100' :
+        e.target.value === 'work' ? style = '#5C6BC0' :
+        e.target.value === 'personal' ? style = '#66BB6A' :
         style = 'none';
         
     };

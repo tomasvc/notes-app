@@ -9,9 +9,7 @@ const SearchNotes = ({ onSearch }) => {
     }, [input])
 
     return (
-        <div>
             <input className="search-bar" placeholder="Search notes" onChange={(e) => setInput(e.target.value)} />
-        </div>
     )
 }
 

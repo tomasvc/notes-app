@@ -1,43 +1,26 @@
 import './App.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Notes from './components/Notes';
-import AddButton from './components/AddButton';
-import AddNoteDialog from './components/AddNoteDialog';
-import EditNote from './components/EditNote';
+import AddNoteModal from './components/AddNoteModal';
 import SearchNotes from './components/SearchNotes';
 import ProgressBar from './components/ProgressBar';
 import Filter from './components/Filter';
 import SignIn from './components/SignIn';
 import SignOut from './components/SignOut';
+import { Button } from '@material-ui/core';
 
 import firebase from 'firebase/app';
-import 'firebase/firestore';
-import 'firebase/auth';
+import { db, auth } from './firebase';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollectionData } from 'react-firebase-hooks/firestore'
-
-firebase.initializeApp({
-  apiKey: "AIzaSyD2FAWgHdsPSyDT9MHKjLhz5VQf_13hwI4",
-  authDomain: "notes-441a3.firebaseapp.com",
-  projectId: "notes-441a3",
-  storageBucket: "notes-441a3.appspot.com",
-  messagingSenderId: "399430406358",
-  appId: "1:399430406358:web:6770b7463320fb57477977",
-  measurementId: "G-ZGKH7BJZTX"
-})
-
-const auth = firebase.auth();
-const firestore = firebase.firestore();
+import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 function App() {
 
   const [user] = useAuthState(auth);
 
-  const notesRef = firestore.collection('notes');
-  const query = notesRef.orderBy('createdAt');
+  const [notes] = useCollectionData(db.collection('notes').orderBy('createdAt'));
 
-  const [notes] = useCollectionData(query, {idField: 'id'});
   const [noteNum, setNoteNum] = useState(0);
   const [complete, setComplete] = useState(0);
 
@@ -45,58 +28,55 @@ function App() {
 
   const [searchList, setSearchList] = useState([])
 
-  const [addDialog, setAddDialog] = useState(false);
-  const [editDialog, setEditDialog] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  useEffect(() => {
+    
+    if (notes) {
+      setNoteNum(notes.length)
+    }
+
+  }, [notes])
+
 
   const filter = (value) => {
     setFilterList(notes.filter((note) => {
       return note.category === value
     }))
   }
+ 
 
-  const closeAddDialog = () => {
-    setAddDialog(false);
-  }
-
-  const openAddDialog = () => {
-    setAddDialog(true);
-  }
-
-  const closeEditDialog = () => {
-    setEditDialog(false);
-  }
-
-  const addNote = (name, category, description) => {
+  const addNote = async (name, category, description) => {
 
     const { uid } = auth.currentUser;
 
-    closeAddDialog();
-
-    notesRef.add({
+    await db.collection('notes').add({
       user_id: uid,
-      name: name,
-      category: category,
-      description: description,
+      name,
+      category,
+      description,
       complete: false,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     })
     .then((docRef) => {
       console.log("Document successfully written with ID: " + docRef.id)
-      notesRef.doc(docRef.id).update({id: docRef.id})
-      setNoteNum(notes.length + 1);
-      console.log(noteNum);
+      db.collection('notes').doc(docRef.id).update({id: docRef.id})
+      setNoteNum(noteNum + 1);
     })
     .catch((error) => {
       console.log("Error writing document: ", error)
     })
 
+    setShowAddModal(false);
+
   }
 
-  const completeNote = (id) => {
-    if (noteNum !== 0) {
+  const completeNote = (isComplete) => {
+    if (isComplete === false) {
       setComplete(complete + 1);
     } else {
-      setComplete(0)
+      setComplete(complete - 1);
     }
   }
 
@@ -109,67 +89,90 @@ function App() {
       setSearchList([]);
   }
 
-  const deleteNote = (id) => {
-    notesRef.doc(id).delete().then(() => {
-      console.log('Note deleted with ID ' + notesRef.id);
-      setNoteNum(notes.length - 1);
+  const deleteNote = (id, isComplete) => {
+    db.collection('notes').doc(id).delete().then(() => {
+      if (isComplete && complete > 0) {
+        setComplete(complete - 1);
+      }
     })
     .catch((error) => {
-      console.log("Error deleting note", error)
+      console.log("Error deleting note: ", error)
     })
   } 
 
   const showNotes = (notes) => {
-    console.log(notes.length.toString());
     return notes.length.toString();
   }
 
   const editNote = (id, name, category, description) => {
 
-    setEditDialog(true);
+    db.collection('notes').doc(id).update({
+      name,
+      category,
+      description
+    })
 
-    /*notesRef.doc(id).update({
-      name: name,
-      category: category,
-      description: description
-    })*/
+    setShowEditModal(false)
+
   }
 
   return (
+
       <div className="App">
-        {user ? 
-          <div>
+
+        <AddNoteModal 
+          onAdd={addNote} 
+          open={showAddModal} 
+          close={() => setShowAddModal(false)} 
+        />
+
+        { 
+          user ? 
+
+          <>
+
             <div className="title-background">
               <h1 className="app-title">notes.</h1>
               <h3 className="welcome-message">Hello {user.displayName.substr(0, user.displayName.indexOf(" "))} 👋</h3>
             </div>
+
             <SearchNotes onSearch={searchNotes}/>
-            <Filter onFilter={filter} />
-            <AddButton handleClick={openAddDialog} />
-            <SignOut />
-            <ProgressBar noteNum={noteNum} completeNum={complete} onChange={showNotes}/>
 
-            {searchList.length !== 0 ? <Notes notes={searchList} onComplete={completeNote} onDelete={deleteNote} onEdit={editNote} /> 
+            <div className="nav-container">
+              <Filter onFilter={filter} />
+              <div className="container-buttons">
+                <Button color="primary" variant="contained" className="add-btn" onClick={() => setShowAddModal(true)}>Add Note</Button>
+                <SignOut />
+              </div>
+            </div>
+
+            <ProgressBar noteNum={noteNum} completeNum={complete} onChange={showNotes} value={(complete / notes?.length) * 100}/>
+
+            {
+            searchList.length !== 0 ? <Notes notes={searchList} onComplete={completeNote} onEdit={editNote} onDelete={deleteNote} open={showEditModal} /> 
             : 
-            filterList.length !== 0 ? <Notes notes={filterList} onComplete={completeNote} onDelete={deleteNote} onEdit={editNote} /> 
+            filterList.length !== 0 ? <Notes notes={filterList} onComplete={completeNote} onEdit={editNote} onDelete={deleteNote} open={showEditModal} /> 
             :
-            notes !== undefined ? <Notes notes={notes} onComplete={completeNote} onDelete={deleteNote} onEdit={editNote} /> 
-            :
-            <h1 className="empty-message">You don't have any notes</h1>}
+            notes !== undefined && <Notes notes={notes} onComplete={completeNote} onEdit={editNote} onDelete={deleteNote} open={showEditModal} /> 
+            }
 
-            {addDialog && <AddNoteDialog onAdd={addNote} onClose={closeAddDialog} />}
-            {editDialog && <EditNote /*name={title} category={category} description={description}*/ onEdit={editNote} onClose={closeEditDialog} />}
-          </div>
+          </>
+
           :
+
           <>
             <div className="title-background">
               <h1 className="app-title">notes.</h1>
             </div>
             <SignIn />
-          </>      
+          </>  
+
         }
+
       </div>
-  );
+
+  )
+
 }
 
 export default App;
