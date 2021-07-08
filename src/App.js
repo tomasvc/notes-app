@@ -13,37 +13,51 @@ import firebase from 'firebase/app';
 import { db, auth } from './firebase';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
+
 
 function App() {
 
-  const [user] = useAuthState(auth);
+  const [user] = useAuthState(auth)
 
-  const [notes] = useCollectionData(db.collection('notes').orderBy('createdAt'));
+  const [notes, setNotes] = useState(null)
 
   const [noteNum, setNoteNum] = useState(0);
   const [complete, setComplete] = useState(0);
 
-  const [filterList, setFilterList] = useState([])
-
+  const [filteredList, setFilteredList] = useState([])
   const [searchList, setSearchList] = useState([])
 
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
 
+
   useEffect(() => {
-    
-    if (notes) {
-      setNoteNum(notes.length)
+
+    if (user) {
+
+      db.collection('notes').where('user_id', '==', user?.uid).get().then(snapshot => {
+        setNotes(snapshot.docs.map(item => item.data()))
+      })
+
     }
 
-  }, [notes])
+  }, [user])
 
+
+  useEffect(() => {
+    setNoteNum(notes?.length)
+  }, [notes])
+  
 
   const filter = (value) => {
-    setFilterList(notes.filter((note) => {
+
+    setFilteredList(notes.filter((note) => {
       return note.category === value
     }))
+
+    if (filteredList.length === 0) {
+      setFilteredList(['<h1 className="error-empty">Could not find any notes</h1>'])
+    }
+
   }
  
 
@@ -59,26 +73,32 @@ function App() {
       complete: false,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     })
-    .then((docRef) => {
+    .then( async (docRef) => {
       console.log("Document successfully written with ID: " + docRef.id)
-      db.collection('notes').doc(docRef.id).update({id: docRef.id})
-      setNoteNum(noteNum + 1);
+      await db.collection('notes').doc(docRef.id).update({id: docRef.id})
+    })
+    .then( async () => {
+      await db.collection('notes').where('user_id', '==', user?.uid).get().then(snapshot => {
+        setNotes(snapshot.docs.map(item => item.data()))
+      })
     })
     .catch((error) => {
       console.log("Error writing document: ", error)
     })
 
-    setShowAddModal(false);
+    setShowAddModal(false)
 
   }
+
 
   const completeNote = (isComplete) => {
     if (isComplete === false) {
-      setComplete(complete + 1);
+      setComplete(complete + 1)
     } else {
-      setComplete(complete - 1);
+      setComplete(complete - 1)
     }
   }
+
 
   const searchNotes = (input) => {
     if (input) {
@@ -86,13 +106,32 @@ function App() {
         return note.name.includes(input)
       }))
     } else
-      setSearchList([]);
+      setSearchList([])
   }
 
-  const deleteNote = (id, isComplete) => {
-    db.collection('notes').doc(id).delete().then(() => {
+
+  const deleteNote = async (id, isComplete) => {
+    await db.collection('notes').doc(id).delete().then(() => {
       if (isComplete && complete > 0) {
-        setComplete(complete - 1);
+
+        setComplete(complete - 1)
+
+        db.collection('notes').where('user_id', '==', user?.uid).get().then(snapshot => {
+          setNotes(snapshot.docs.map(item => item.data()))
+        })
+        
+      } else if (!isComplete && complete > 0) {
+
+        db.collection('notes').where('user_id', '==', user?.uid).get().then(snapshot => {
+          setNotes(snapshot.docs.map(item => item.data()))
+        })
+
+      } else {
+
+        db.collection('notes').where('user_id', '==', user?.uid).get().then(snapshot => {
+          setNotes(snapshot.docs.map(item => item.data()))
+        })
+
       }
     })
     .catch((error) => {
@@ -100,21 +139,11 @@ function App() {
     })
   } 
 
-  const showNotes = (notes) => {
-    return notes.length.toString();
+
+  const showNotesNum = (notes) => {
+    return notes.length.toString()
   }
 
-  const editNote = (id, name, category, description) => {
-
-    db.collection('notes').doc(id).update({
-      name,
-      category,
-      description
-    })
-
-    setShowEditModal(false)
-
-  }
 
   return (
 
@@ -127,9 +156,10 @@ function App() {
         />
 
         { 
+
           user ? 
 
-          <>
+          <div>
 
             <div className="title-background">
               <h1 className="app-title">notes.</h1>
@@ -146,26 +176,26 @@ function App() {
               </div>
             </div>
 
-            <ProgressBar noteNum={noteNum} completeNum={complete} onChange={showNotes} value={(complete / notes?.length) * 100}/>
+            <ProgressBar noteNum={noteNum} completeNum={complete} onChange={showNotesNum} value={(complete / notes?.length) * 100}/>
 
             {
-            searchList.length !== 0 ? <Notes notes={searchList} onComplete={completeNote} onEdit={editNote} onDelete={deleteNote} open={showEditModal} /> 
+            searchList.length !== 0 ? <Notes notes={searchList} onComplete={completeNote} onDelete={deleteNote} /> 
             : 
-            filterList.length !== 0 ? <Notes notes={filterList} onComplete={completeNote} onEdit={editNote} onDelete={deleteNote} open={showEditModal} /> 
+            filteredList.length !== 0 ? <Notes notes={filteredList} onComplete={completeNote} onDelete={deleteNote} /> 
             :
-            notes !== undefined && <Notes notes={notes} onComplete={completeNote} onEdit={editNote} onDelete={deleteNote} open={showEditModal} /> 
+            notes !== undefined && <Notes notes={notes} onComplete={completeNote} onDelete={deleteNote} /> 
             }
 
-          </>
+          </div>
 
           :
 
-          <>
+          <div>
             <div className="title-background">
               <h1 className="app-title">notes.</h1>
             </div>
             <SignIn />
-          </>  
+          </div>  
 
         }
 
